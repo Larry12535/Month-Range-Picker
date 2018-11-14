@@ -26,7 +26,6 @@ class Calendar extends React.Component {
     }
 
     this.calStyle = {
-      width: '700px',
       top: `${positionTop}px`,
       left: `${positionLeft}px`,
       display: props.display ? 'block' : 'none',
@@ -47,6 +46,16 @@ class Calendar extends React.Component {
   componentDidMount() {
     this.$el = $(this.node);
     this.setStyle(this.props);
+    document.addEventListener('mousedown', this.handleClick)
+  }
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleClick)
+  }
+  handleClick = e => {
+    if (this.node.contains(e.target)) {
+      return;
+    }
+    this.props.onOutsideClick();
   }
   componentWillReceiveProps(nextProps) {
     this.setStyle(nextProps);
@@ -145,7 +154,7 @@ class Calendar extends React.Component {
         <div className="arrow" style={this.arrowStyle} />
         <div className="clearfix sec-wrap">
           <div className="calendar col-xs-10">
-            <div className="clearfix">
+            <div className="clearfix yr-start-end-calendar-wrap">
               <div className="col-xs-6 year-start year">
                 <YearStart
                   restrictionRange={this.props.restrictionRange}
@@ -166,22 +175,6 @@ class Calendar extends React.Component {
               </div>
             </div>
           </div>
-          <div className="shortcuts col-xs-2">
-            <button
-              onClick={this.props.onApply}
-              type="button"
-              className="btn btn-block btn-success"
-            >
-            Apply
-            </button>
-            <button
-              onClick={this.props.onCancel}
-              type="button"
-              className="btn btn-default btn-block"
-            >
-            Cancel
-            </button>
-          </div>
         </div>
       </div>
     );
@@ -196,6 +189,7 @@ Calendar.propTypes = {
   onSelect: React.PropTypes.func.isRequired,
   onApply: React.PropTypes.func.isRequired,
   onCancel: React.PropTypes.func.isRequired,
+  onOutsideClick: React.PropTypes.func.isRequired,
   onYearChange: React.PropTypes.func,
   position: React.PropTypes.shape({
     top: React.PropTypes.number,
